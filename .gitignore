@@ -1,0 +1,13 @@
+node_modules
+npm-debug.log
+
+# IntelliJ
+*.iml
+*.ipr
+*.iws
+*.ids
+.idea
+
+# Mac OS X
+.DS_Store
+
