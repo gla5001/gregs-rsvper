@@ -22,6 +22,16 @@ var RsvpService = (function() {
     REGISTERED = 'registered',
     NOT_REGISTERED = 'not registered';
 
+  /**
+   * Function to resolve a promise after the specified amount of time.
+   * Basically used to allow time for a page to render in the phantom browser.
+   * Probably a better way to this, just hacked this together to wait for page renderings.
+   *
+   * @param {Number} millisToWait - The amount of time to wait in millis.
+   * @param {String|Object|Array|Number} resolvedVal - The value to resolve.
+   *
+   * @returns {Promise} - A promise that resolve to the resolvedVal after specified time.
+   */
   var waitForPageLoad = function(millisToWait, resolvedVal) {
     millisToWait = millisToWait || 0;
 
@@ -33,6 +43,20 @@ var RsvpService = (function() {
     });
   };
 
+  /**
+   * Function to rsvp to an Eventbrite event.
+   * Opens a phantom browser and fills in necessary fields and then submits via dom.
+   *
+   * @param {Object} params - The paramter object.
+   * @param {String} params.url - The url of the rsvp form.
+   * @param {String} params.firstName - The first name of rsvp'er.
+   * @param {String} params.lastName - The last name of rsvp'er.
+   * @param {String} params.email - The email of rsvp'er.
+   * @param {String} [params.event='event'] - The event name.
+   *
+   * @returns {Promise} - A promise that resolve to an object specifying if the event was registered
+   *  or not registered and a message if something happened.
+   */
   var eventbriteRsvp = function(params) {
     // used for screen capture name
     var eventName = params.event || 'event',
@@ -226,6 +250,7 @@ var RsvpService = (function() {
                 return new Promise(function(resolve, reject) {
                   // allow time to process request
                   setTimeout(function() {
+                    // take a screenshot
                     page.render('screenshots/ ' + eventName.replace(/ /g, '-') + '-rsvp.jpeg', {format: 'jpeg', quality: '60'});
 
                     console.log('closing browser.');
@@ -241,6 +266,7 @@ var RsvpService = (function() {
               })
               .catch(function(err) {
                 console.log(err);
+                // take a screenshot
                 page.render('screenshots/ errors/ error-' + eventName.replace(/ /g, '-') + '-rsvp.jpeg', {format: 'jpeg', quality: '60'});
 
                 console.log('closing browser.');

@@ -2,7 +2,11 @@
  * Copyright 2016 Greg Alexander
  */
 
-
+/**
+ * A Cli to auto rsvp to events
+ *
+ * @constructor
+ */
 var Scraper = (function() {
   'use strict';
 
@@ -28,6 +32,16 @@ var Scraper = (function() {
     DO_512 = 'do512',
     OTHER = 'other';
 
+  /**
+   * Constructor function for CLI.
+   *
+   * @param {Object} params - The parameters object.
+   * @param {String} params.email - The rsvp'er email.
+   * @param {String} params.firstName - The rsvp'er first name.
+   * @param {String} params.lastName - The rsvp'er last name.
+   *
+   * @returns {Scraper} - A new instance of Scraper.
+   */
   var Scraper = function(params) {
     if (!params.email) {
       throw new Error('email is required!');
@@ -60,6 +74,19 @@ var Scraper = (function() {
 
   Scraper.prototype.name = 'Scraper';
 
+  /**
+   * Generate the list of events to rsvp to.
+   * Scrapes google doc to generate the list
+   *
+   * @returns {Promise} - A promise that resolves to a list of events.
+   *  eventObj = {
+   *     event: event name,
+   *     url: rsvp link,
+   *     date: date,
+   *     venue: venue name,
+   *     type: rsvp type
+   *  }
+   */
   Scraper.prototype.getURLList = function() {
     var self = this;
 
@@ -117,6 +144,12 @@ var Scraper = (function() {
 
   };
 
+  /**
+   * Generate a csv file of the results and write to disk.
+   * NOTE: file path is hardcoded at this point. WILL CHANGE
+   *
+   * @returns {Promise} - A promise that resolves when the results csv file is written.
+   */
   Scraper.prototype.writeResultsCsv = function(results) {
     var headerNames = ['name', 'date', 'venue', 'url', 'result', 'error_message'],
       csvText = '';
@@ -154,6 +187,11 @@ var Scraper = (function() {
     return FS.write('/Users/alexag1/Downloads/results.csv', csvText);
   };
 
+  /**
+   * Begins the rsvp'ing process
+   *
+   * @returns {Promise} - A promise that resolves when scraping and rsvp'ing is complete.
+   */
   Scraper.prototype.scrape = function() {
     var self = this,
       totalEvents = 0,
@@ -200,7 +238,7 @@ var Scraper = (function() {
                   };
               });
           }, {
-            concurrency: 7
+            concurrency: 10
           })
           .then(function(results) {
             console.log('Total events: ' + totalEvents + '\n' + 'Eventbrite events: ' + eventbriteCount + '\n' + 'Do512 events: ' + do512count);
@@ -218,6 +256,9 @@ var Scraper = (function() {
 // Export the class definition
 module.exports = Scraper;
 
+/**
+ * The following is executed when this file is run from the command line.
+ */
 (function() {
   'use strict';
 
