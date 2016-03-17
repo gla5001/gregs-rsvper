@@ -94,7 +94,7 @@ var Scraper = (function() {
       request(GOOGLE_SPREADSHEET_URL, function(error, response, html){
           var events = [],
             $, link, event, date, venue, type,
-            rowColumns;
+            rowColumns, splitLink;
 
           if(error){
             console.log(error);
@@ -117,7 +117,14 @@ var Scraper = (function() {
               } else if (link.indexOf(DO_512) > -1) {
                 type = DO_512;
               } else {
-                type = OTHER;
+                splitLink = link.split('://');
+                if (splitLink.length > 2) {
+                  type = splitLink[2].split('/')[0];
+                } else if (splitLink.length === 2) {
+                  type = splitLink[1].split('/')[0];
+                } else {
+                  type = OTHER;
+                }
               }
 
               $(element).children(GOOGLE_DATA_COLUMN).each(function(index, element) {
