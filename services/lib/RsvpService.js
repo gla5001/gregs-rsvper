@@ -403,7 +403,7 @@ var RsvpService = (function() {
                   })
                   .then(function(hasFirstNameField) {
                     if (!hasFirstNameField) {
-                      return Promise.reject(new EventClosedError('Doesnt have first name field.'));
+                      return Promise.reject(new EventClosedError('Doesnt have first name field. Its most likely closed'));
                     }
 
                     //fill in first name
