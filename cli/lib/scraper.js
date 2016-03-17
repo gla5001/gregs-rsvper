@@ -207,14 +207,21 @@ var Scraper = (function() {
       totalEvents = 0,
       eventbriteCount = 0,
       do512count = 0,
-      splashthatCount = 0;
+      splashthatCount = 0,
+      currentCount = 0;
     
     return self.getURLList()
       .then(function(events) {
         totalEvents = events.length;
+        console.log('Found ' + totalEvents + ' events.');
 
         return Promise.map(events, function(event) {
             var rsvpPromise;
+
+            currentCount++;
+            if (currentCount % 15 === 0) {
+              console.log('On ' + currentCount + ' of ' + totalEvents);
+            }
 
             event.firstName = self.firstName;
             event.lastName = self.lastName;
