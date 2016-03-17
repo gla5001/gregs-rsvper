@@ -30,6 +30,7 @@ var Scraper = (function() {
     GOOGLE_DATA_COLUMN = 'td.s5',
     EVENTBRITE = 'eventbrite',
     DO_512 = 'do512',
+    SPLASHTHAT = 'splashthat',
     OTHER = 'other';
 
   /**
@@ -116,6 +117,8 @@ var Scraper = (function() {
                 type = EVENTBRITE;
               } else if (link.indexOf(DO_512) > -1) {
                 type = DO_512;
+              } else if (link.indexOf(SPLASHTHAT) > -1) {
+                type = SPLASHTHAT;
               } else {
                 splitLink = link.split('://');
                 if (splitLink.length > 2) {
@@ -203,7 +206,8 @@ var Scraper = (function() {
     var self = this,
       totalEvents = 0,
       eventbriteCount = 0,
-      do512count = 0;
+      do512count = 0,
+      splashthatCount = 0;
     
     return self.getURLList()
       .then(function(events) {
@@ -226,6 +230,9 @@ var Scraper = (function() {
                 registered: RsvpService.NOT_REGISTERED,
                 msg: 'Theres a captcha. Cant submit form'
               });
+            } else if (event.type === SPLASHTHAT) {
+              splashthatCount++;
+              rsvpPromise = RsvpService.splashthatRsvp(event);
             } else {
               rsvpPromise = Promise.resolve({
                 registered: RsvpService.NOT_REGISTERED,
@@ -240,7 +247,7 @@ var Scraper = (function() {
                     date: event.date,
                     venue: event.venue,
                     url: event.url,
-                    result: (event.registered === RsvpService.REGISTERED) ? 'Y': 'N',
+                    result: (result.registered === RsvpService.REGISTERED) ? 'Y': 'N',
                     msg: result.msg || null
                   };
               });
@@ -248,7 +255,7 @@ var Scraper = (function() {
             concurrency: 10
           })
           .then(function(results) {
-            console.log('Total events: ' + totalEvents + '\n' + 'Eventbrite events: ' + eventbriteCount + '\n' + 'Do512 events: ' + do512count);
+            console.log('Total events: ' + totalEvents + '\n' + 'Eventbrite events: ' + eventbriteCount + '\n' + 'Do512 events: ' + do512count + '\n' + 'splashthat events: ' + splashthatCount);
             return self.writeResultsCsv(results);
           });
       })
