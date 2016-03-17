@@ -161,7 +161,7 @@ var Scraper = (function() {
    * @returns {Promise} - A promise that resolves when the results csv file is written.
    */
   Scraper.prototype.writeResultsCsv = function(results) {
-    var headerNames = ['name', 'date', 'venue', 'url', 'result', 'error_message'],
+    var headerNames = ['name', 'date', 'venue', 'url', 'type', 'result', 'error_message'],
       csvText = '';
 
     // Helper function
@@ -187,6 +187,7 @@ var Scraper = (function() {
           result.date || '',
           result.venue || '',
           result.url || '',
+          result.type || '',
           result.result || '',
           result.msg || ''
         ];
@@ -254,6 +255,7 @@ var Scraper = (function() {
                     date: event.date,
                     venue: event.venue,
                     url: event.url,
+                    type: event.type,
                     result: (result.registered === RsvpService.REGISTERED) ? 'Y': 'N',
                     msg: result.msg || null
                   };
