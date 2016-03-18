@@ -398,6 +398,17 @@ var RsvpService = (function() {
                 return RsvpService.waitForPageLoad(500);
               })
               .then(function() {
+                var captchaPromise = page.evaluate(function() {
+                    return document.querySelectorAll('iframe[title="recaptcha widget"]').length > 0;
+                  })
+                  .then(function(hasCaptcha) {
+                    if (hasCaptcha) {
+                      return Promise.reject(new EventClosedError('Cant register. Has Captcha'));
+                    }
+
+                    return Promise.resolve();
+                  });
+
                 var firstNamePromise = page.evaluate(function() {
                     return document.querySelectorAll('input#rsvp-first-name').length > 0;
                   })
@@ -440,7 +451,20 @@ var RsvpService = (function() {
                     }, email);
                   });
 
-                return Promise.join(firstNamePromise, lastNamePromise, emailPromise);
+                var companyPromise = page.evaluate(function() {
+                    return document.querySelectorAll('input[placeholder="Company"]').length > 0;
+                  })
+                  .then(function(hasCustomerCompanyField) {
+                    if (!hasCustomerCompanyField) {
+                      return Promise.resolve();
+                    }
+
+                    return page.evaluate(function() {
+                      return document.querySelectorAll('input[placeholder="Company"]')[0].value = 'self';
+                    });
+                  });
+
+                return Promise.join(captchaPromise, firstNamePromise, lastNamePromise, emailPromise, companyPromise);
               })
               .then(function() {
                 //submit form
